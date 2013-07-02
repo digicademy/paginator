@@ -1,0 +1,13 @@
+<f:if condition="{configuration.showCount}">
+	<f:render partial="Count" arguments="{figures : figures}" />
+</f:if>
+
+<f:if condition="{configuration.insertAbove}">
+	<f:render partial="Paginator" arguments="{pagination : pagination, configuration : configuration}" />
+</f:if>
+
+<f:renderChildren arguments="{objects}" />
+
+<f:if condition="{configuration.insertBelow}">
+	<f:render partial="Paginator" arguments="{pagination : pagination, configuration : configuration}" />
+</f:if>

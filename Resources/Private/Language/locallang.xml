@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+	<meta type="array">
+		<type>module</type>
+		<description>Language labels for the Historical Sources Online Database extension in the FRONTEND</description>
+	</meta>
+	<data type="array">
+		<languageKey index="default" type="array">
+			
+			<label index="list.count">The list has %1$d entrie(s).</label>
+			<label index="list.range">Displaying entries %1$d to %2$d.</label>
+				
+		</languageKey>
+		
+		<languageKey index="de" type="array">					
+			
+			<label index="list.count">Die Liste hat %1$d Einträge.</label>
+			<label index="list.range">Sie sehen die Einträge %1$d bis %2$d.</label>				
+		
+		</languageKey>		
+	</data>
+</T3locallang>
