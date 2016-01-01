@@ -1,9 +1,9 @@
 <?php
-
+namespace ADWLM\Paginator\ViewHelpers\Widget\Controller;
 /***************************************************************
- *  Copyright notice
+*  Copyright notice
 *
-*  (c) 2012 Torsten Schrade <schradt@uni-mainz.de>, Academy of sciences and literature, Mainz
+*  (c) 2015 Torsten Schrade <Torsten.Schrade@adwmainz.de>, Academy of Sciences and Literature | Mainz
 *
 *  All rights reserved
 *
@@ -24,63 +24,90 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
-class Tx_Paginator_ViewHelpers_Widget_Controller_ListController extends Tx_Fluid_Core_Widget_AbstractWidgetController {
+use \TYPO3\CMS\Fluid\Core\Widget\AbstractWidgetController;
+use \TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
+use \TYPO3\CMS\Core\Utility\ArrayUtility;
+use \TYPO3\CMS\Core\Utility\GeneralUtility;
+use \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
+
+class ListController extends AbstractWidgetController {
 
 	/**
+	 * The widget configuration
+	 *
 	 * @var array
 	 */
 	protected $configuration = array('itemsPerPage' => 10, 'maxPageNumberElements' => 10, 'insertAbove' => TRUE, 'insertBelow' => TRUE, 'showCount' => FALSE);
 
 	/**
-	 * @var Tx_Extbase_Persistence_QueryResultInterface
+	 * Objects to paginate
+	 *
+	 * @var QueryResultInterface
 	 */
 	protected $objects;
 
 	/**
+	 * The current page within the paginated set
+	 *
 	 * @var integer
 	 */
 	protected $currentPage = 1;
 
 	/**
+	 * The number of pages in the paginated set
+	 *
 	 * @var integer
 	 */
 	protected $numberOfPages = 1;
 
 	/**
+	 * Amount of items to show per page
+	 *
 	 * @var integer
 	 */
 	protected $itemsPerPage = 1;
 
 	/**
+	 * The maximum amount of pages to show at a time
+	 *
 	 * @var integer
 	 */
-	protected $maxPageNumberElements = 0;
+	protected $maxPageNumberElements = 1;
 
 	/**
+	 * Configuration Manager
+	 * @var \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface
+	 * @inject
+	 */
+	protected $configurationManager;
+
+	/**
+	 * Merges the submitted configuration and sets basic vars
+	 *
 	 * @return void
 	 */
 	public function initializeAction() {
+		ArrayUtility::mergeRecursiveWithOverrule($this->configuration, $this->widgetConfiguration['configuration']);
 		$this->objects = $this->widgetConfiguration['objects'];
-		$this->configuration = t3lib_div::array_merge_recursive_overrule($this->configuration, $this->widgetConfiguration['configuration'], TRUE);
+		$this->itemsPerPage = (int) $this->configuration['itemsPerPage'];
+		$this->maxPageNumberElements = (int) $this->configuration['maxPageNumberElements'];
+		((int) $this->widgetConfiguration['arguments']['currentPage'] > 0) ? $this->currentPage = (int) $this->widgetConfiguration['arguments']['currentPage'] : $this->currentPage = 1;
 	}
 
 	/**
-	 * @param integer $currentPage
+	 * Retrieves the original query from the extbase query result and executes it
+	 * with a limit. Also provides experimental support for extbase queries in form
+	 * of MySQL statements. Builds and assigns the pagination to the widget list view.
+	 *
 	 * @return void
 	 */
-	public function indexAction($currentPage = 1) {
+	public function indexAction() {
 
-		// get current query
+			// get current query from QueryResultInterface
 		$query = $this->objects->getQuery();
 		if (is_object($query->getStatement())) {
 			$statement = $query->getStatement()->getStatement();
 		}
-
-			// determine items shown per page
-		$this->itemsPerPage = (integer) $this->configuration['itemsPerPage'];
-
-			// set page elements to show
-		$this->maxPageNumberElements = (integer) $this->configuration['maxPageNumberElements'];
 
 			// number of pages
 		if ($statement) {
@@ -88,16 +115,14 @@ class Tx_Paginator_ViewHelpers_Widget_Controller_ListController extends Tx_Fluid
 			$res = $GLOBALS['TYPO3_DB']->sql_query($countQuery);
 			$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
 			if ($row['COUNT(*)'] > 0) {
-				$this->numberOfPages = ceil($row['COUNT(*)'] / (integer) $this->configuration['itemsPerPage']);
+				$this->numberOfPages = ceil($row['COUNT(*)'] / $this->itemsPerPage);
 			}
 		} else {
-			// perform count
-			$this->numberOfPages = ceil(count($this->objects) / (integer) $this->configuration['itemsPerPage']);
+				// perform count
+			$this->numberOfPages = ceil(count($this->objects) / $this->itemsPerPage);
 		}
 
-			// set the current page
-		$this->currentPage = (integer) $currentPage;
-		if ($this->currentPage < 1) $this->currentPage = 1;
+			// keeps current page equal to total number of pages
 		if ($this->currentPage > $this->numberOfPages) $this->currentPage = $this->numberOfPages;
 
 			// query limit
@@ -108,7 +133,7 @@ class Tx_Paginator_ViewHelpers_Widget_Controller_ListController extends Tx_Fluid
 		} else {
 			$query->setLimit($this->itemsPerPage);
 			if ($this->currentPage > 1) {
-				$query->setOffset((integer) ($this->itemsPerPage * ($this->currentPage - 1)));
+				$query->setOffset((int) ($this->itemsPerPage * ($this->currentPage - 1)));
 			}
 		}
 
@@ -118,10 +143,15 @@ class Tx_Paginator_ViewHelpers_Widget_Controller_ListController extends Tx_Fluid
 		$this->view->assign('pagination', $this->buildPagination());
 		$this->view->assign('figures', $this->getFigures());
 		$this->view->assign('arguments', $this->widgetConfiguration['arguments']);
+
+			// get configuration for assigning extension and plugin names for link view helper in widget template
+		$frameworkConfiguration = $this->configurationManager->getConfiguration(ConfigurationManagerInterface::CONFIGURATION_TYPE_FRAMEWORK);
+		$this->view->assign('frameworkConfiguration', array('extensionName' => $frameworkConfiguration['extensionName'], 'pluginName' => $frameworkConfiguration['pluginName']));
 	}
 
 	/**
-	 * Returns an array with the keys "pages", "current", "numberOfPages", "nextPage" & "previousPage"
+	 * Calculates the values for the pagination.
+	 * Returns an array with the keys "pages", "currentPage", "numberOfPages", "nextPage" and "previousPage"
 	 *
 	 * @return array
 	 */
@@ -156,7 +186,7 @@ class Tx_Paginator_ViewHelpers_Widget_Controller_ListController extends Tx_Fluid
 
 		$pagination = array(
 			'pages' => $pages,
-			'current' => $this->currentPage,
+			'currentPage' => $this->currentPage,
 			'numberOfPages' => $this->numberOfPages,
 			'previousPageRange' => $edgePages[$currentPageLocation-1],
 			'nextPageRange' => ($edgePages[$currentPageLocation+1] != NULL) ? $edgePages[$currentPageLocation+1]+1 : 0
@@ -173,7 +203,9 @@ class Tx_Paginator_ViewHelpers_Widget_Controller_ListController extends Tx_Fluid
 		return $pagination;
 	}
 
-	/*
+	/**
+	 * Gets the figures for the result count ("showing results X from Y")
+	 *
 	 * @return array
 	 */
 	protected function getFigures() {

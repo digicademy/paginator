@@ -1,6 +1,0 @@
-# <f:cObject typoscriptObjectPath="lib.tx_hisodat.resultbrowser.currentpage" />
-
-lib.tx_hisodat.resultbrowser.currentpage = TEXT
-lib.tx_hisodat.resultbrowser.currentpage {
-	data = GP : tx_hisodat_display|__widget_0|currentPage
-}

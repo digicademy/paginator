@@ -7,16 +7,18 @@
 	<data type="array">
 		<languageKey index="default" type="array">
 			
-			<label index="list.count">The list has %1$d entrie(s).</label>
-			<label index="list.range">Displaying entries %1$d to %2$d.</label>
+			<label index="list.count">The list has %1$d entrie(s)</label>
+			<label index="list.range">Displaying entries %1$d to %2$d</label>
+			<label index="single.range">Displaying entry %1$d of %2$d</label>
 				
 		</languageKey>
 		
-		<languageKey index="de" type="array">					
+		<languageKey index="de" type="array">
 			
-			<label index="list.count">Die Liste hat %1$d Einträge.</label>
-			<label index="list.range">Sie sehen die Einträge %1$d bis %2$d.</label>				
+			<label index="list.count">Die Liste hat %1$d Einträge</label>
+			<label index="list.range">Sie sehen die Einträge %1$d bis %2$d</label>
+			<label index="single.range">Sie sehen den Eintrag %1$d von %2$d</label>
 		
-		</languageKey>		
+		</languageKey>
 	</data>
 </T3locallang>

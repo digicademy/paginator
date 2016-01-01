@@ -1,0 +1,10 @@
+# IDEAS
+
+## GENERAL
+
+- also allow arrays and object storages as paginable sets
+
+## LIST
+
+- create different functionality for page ranges => next to next page in range, dots in middle
+- better support for extbase statement queries

@@ -1,43 +1,37 @@
-<f:if condition="{pagination.numberOfPages} > 1">
+{namespace paginate = ADWLM\Paginator\ViewHelpers}
 
-	<ul class="pagination">
+<f:if condition="{pagination.numberOfPages} > 0">
+
+	<ul class="pagination list">
 
 		<f:if condition="{pagination.numberOfPages} > {configuration.maxPageNumberElements}">
 			<f:if condition="{pagination.previousPageRange} > 0">
 				<f:then>
-					<li class="first"><f:widget.link arguments="{currentPage: 0}">««</f:widget.link></li>
-					<li class="previous"><f:widget.link arguments="{currentPage: pagination.previousPageRange}">«</f:widget.link></li>
+					<li class="first">
+						<f:link.action extensionName="{frameworkConfiguration.extensionName}" pluginName="{frameworkConfiguration.pluginName}" controller="{arguments.controller}" arguments="{paginate:CleanArguments(arguments : arguments, substitute : {currentPage : 1})}">««</f:link.action>
+					</li>
+					<li class="prev">
+						<f:link.action extensionName="{frameworkConfiguration.extensionName}" pluginName="{frameworkConfiguration.pluginName}" controller="{arguments.controller}" arguments="{paginate:CleanArguments(arguments : arguments, substitute : {currentPage : pagination.previousPageRange})}">«</f:link.action>
+					</li>
 				</f:then>
 			</f:if>
 		</f:if>
 
-		<f:for each="{pagination.pages}" as="page">
-			<f:if condition="{page.isCurrent}">
-				<f:then>
-					<li class="act">
-						<f:widget.link>{page.number}</f:widget.link>
-					</li>
-				</f:then>
-				<f:else>
-					<li>
-						<f:if condition="{page.number} > 1">
-							<f:then>
-								<f:widget.link arguments="{currentPage: page.number}">{page.number}</f:widget.link>
-							</f:then>
-							<f:else>
-								<f:widget.link>{page.number}</f:widget.link>
-							</f:else>
-						</f:if>
-					</li>
-				</f:else>
-			</f:if>
+		<f:for each="{pagination.pages}" as="page" iteration="iterator">
+			<li class="number{f:if(condition : '{page.isCurrent}', then : ' active', else : '')}">
+				<f:link.action extensionName="{frameworkConfiguration.extensionName}" pluginName="{frameworkConfiguration.pluginName}" controller="{arguments.controller}" arguments="{paginate:CleanArguments(arguments : arguments, substitute : {currentPage : page.number})}">{page.number}</f:link.action>
+			</li>
 		</f:for>
 
 		<f:if condition="{pagination.numberOfPages} > {configuration.maxPageNumberElements}">
 			<f:if condition="{pagination.nextPageRange} > 0">
 				<f:then>
-					<li class="next"><f:widget.link arguments="{currentPage: pagination.nextPageRange}">»</f:widget.link></li>
-					<li class="last"><f:widget.link arguments="{currentPage: pagination.numberOfPages}">»»</f:widget.link></li>
+					<li class="next">
+						<f:link.action extensionName="{frameworkConfiguration.extensionName}" pluginName="{frameworkConfiguration.pluginName}" controller="{arguments.controller}" arguments="{paginate:CleanArguments(arguments : arguments, substitute : {currentPage : pagination.nextPageRange})}">»</f:link.action>
+					</li>
+					<li class="last">
+						<f:link.action extensionName="{frameworkConfiguration.extensionName}" pluginName="{frameworkConfiguration.pluginName}" controller="{arguments.controller}" arguments="{paginate:CleanArguments(arguments : arguments, substitute : {currentPage : pagination.numberOfPages})}">»»</f:link.action>
+					</li>
 				</f:then>
 			</f:if>
 		</f:if>

@@ -1,0 +1,30 @@
+{namespace paginate = ADWLM\Paginator\ViewHelpers}
+
+<f:if condition="{configuration.showCount}">
+    <p class="pagination count">
+        <f:translate key="single.range" arguments="{1: arguments.currentItem, 2: pagination.totalItems}" />
+    </p>
+</f:if>
+
+<ul class="pagination single">
+    <li class="first">
+        <f:link.action extensionName="{frameworkConfiguration.extensionName}" pluginName="{frameworkConfiguration.pluginName}" controller="{arguments.controller}" arguments="{paginate:CleanArguments(arguments : arguments, substitute : '{paginate:SetObjectArgumentName(objectArgumentName : configuration.objectArgumentName, array : {OBJECT : pagination.firstUid, currentItem : pagination.firstItem, currentPage : pagination.firstPage})}')}">
+            ««
+        </f:link.action>
+    </li>
+    <li class="prev">
+        <f:link.action extensionName="{frameworkConfiguration.extensionName}" pluginName="{frameworkConfiguration.pluginName}" controller="{arguments.controller}" arguments="{paginate:CleanArguments(arguments : arguments, substitute : '{paginate:SetObjectArgumentName(objectArgumentName : configuration.objectArgumentName, array : {OBJECT : pagination.previousUid, currentItem : pagination.previousItem, currentPage : pagination.previousPage})}')}">
+            «
+        </f:link.action>
+    </li>
+    <li class="next">
+        <f:link.action extensionName="{frameworkConfiguration.extensionName}" pluginName="{frameworkConfiguration.pluginName}" controller="{arguments.controller}" arguments="{paginate:CleanArguments(arguments : arguments, substitute : '{paginate:SetObjectArgumentName(objectArgumentName : configuration.objectArgumentName, array : {OBJECT : pagination.nextUid, currentItem : pagination.nextItem, currentPage : pagination.nextPage})}')}">
+            »
+        </f:link.action>
+    </li>
+    <li class="last">
+        <f:link.action extensionName="{frameworkConfiguration.extensionName}" pluginName="{frameworkConfiguration.pluginName}" controller="{arguments.controller}" arguments="{paginate:CleanArguments(arguments : arguments, substitute : '{paginate:SetObjectArgumentName(objectArgumentName : configuration.objectArgumentName, array : {OBJECT : pagination.lastUid, currentItem : pagination.lastItem, currentPage : pagination.lastPage})}')}">
+            »»
+        </f:link.action>
+    </li>
+</ul>
